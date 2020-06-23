@@ -16501,10 +16501,22 @@ according to the value of `org-display-remote-inline-images'."
 	 (file-or-data
 	  (pcase org-display-remote-inline-images
 	    ((guard (not remote?)) file)
-	    (`download (with-temp-buffer
-			 (set-buffer-multibyte nil)
-			 (insert-file-contents-literally file)
-			 (buffer-string)))
+	    (`download (let ((new (concat temporary-file-directory
+					  "tramp/"
+					  (file-remote-p file 'host)
+					  (file-local-name file))))
+			 ;; dont download file if local copy exists & is newer than remote
+			 (if (and (file-exists-p new)
+				  (file-newer-than-file-p new file))
+			     (with-temp-buffer
+			       (set-buffer-multibyte nil)
+			       (insert-file-contents-literally new)
+			       (buffer-string))
+			   (with-temp-file new
+			     (make-directory (file-name-directory new) t)
+			     (set-buffer-multibyte nil)
+			     (insert-file-contents-literally file)
+			     (buffer-string)))))
 	    (`cache (let ((revert-without-query '(".")))
 		      (with-current-buffer (find-file-noselect file)
 			(buffer-string))))
