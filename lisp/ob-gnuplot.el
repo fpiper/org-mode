@@ -135,8 +135,10 @@ code."
            (timefmt (cdr (assq :timefmt params)))
            (time-ind (or (cdr (assq :timeind params))
                          (when timefmt 1)))
-	   (directory (and (buffer-file-name)
-			   (file-name-directory (buffer-file-name))))
+	   (directory (org-babel-local-file-name
+                       (or (cdr (assq :dir params))
+                           (and (buffer-file-name)
+			        (file-name-directory (buffer-file-name))))))
 	   (add-to-body (lambda (text) (setq body (concat text "\n" body)))))
       ;; append header argument settings to body
       (when missing (funcall add-to-body (format "set datafile missing '%s'" missing)))
