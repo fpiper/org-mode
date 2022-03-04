@@ -117,7 +117,7 @@ code."
   "Expand BODY according to PARAMS, return the expanded body."
   (save-window-excursion
     (let* ((vars (org-babel-gnuplot-process-vars params))
-           (out-file (cdr (assq :file params)))
+           (out-file (cdr (assq :file params))) ;; FIXME: Need to transfer out-file to local if gnuplot is running remote
 	   (prologue (cdr (assq :prologue params)))
 	   (epilogue (cdr (assq :epilogue params)))
 	   (term (or (cdr (assq :term params))
